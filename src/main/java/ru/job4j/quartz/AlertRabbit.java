@@ -5,6 +5,11 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import static org.quartz.JobBuilder.newJob;
@@ -12,48 +17,68 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 public class AlertRabbit {
+
+    /**
+     *читаем файл конфигурации
+     */
+    private static Properties init(String properties) {
+        Properties config = new Properties();
+        try (InputStream in = AlertRabbit.class.getClassLoader()
+                .getResourceAsStream(properties)) {
+            config.load(in);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return config;
+    }
+
+    /**
+     * подключаемся к БД
+     * @param config - контейнер с настройками
+     * @return - конект к базе
+     * */
+    private static Connection connection(Properties config)
+            throws ClassNotFoundException, SQLException {
+
+        Class.forName(config.getProperty("driver-class-name"));
+        Connection cn = DriverManager.getConnection(
+                config.getProperty("url"),
+                config.getProperty("username"),
+                config.getProperty("password")
+        );
+        return cn;
+    }
+
     public static void main(String[] args) {
-        try {
-            /**
-             * 1. Конфигурирование.
-             * Начало работы происходит с создания класса управляющего всеми работами.
-             * В объект Scheduler мы будем добавлять задачи, которые хотим выполнять периодически.
-             */
+
+        Properties properties = init("rabbit.properties");
+        try (Connection connect = connection(properties)) {
             Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
             scheduler.start();
-            /**
-             * 2. Создание задачи.
-             * quartz каждый раз создает объект с типом org.quartz.Job,
-             * нужно создать класс реализующий этот интерфейс.
-             */
-            JobDetail job = newJob(Rabbit.class).build();
-            /**
-             * 3. Создание расписания.
-             * Конструкция выше настраивает периодичность запуска.
-             * В нашем случае, мы будем запускать задачу через 10 секунд и делать это бесконечно.
-             */
+            JobDataMap data = new JobDataMap();
+            data.put("connect", connect);
+            JobDetail job = newJob(Rabbit.class)
+                    .usingJobData(data)
+                    .build();
             SimpleScheduleBuilder times = simpleSchedule()
                     .withIntervalInSeconds(propertiesInfo())
                     .repeatForever();
-            /**
-             * 4. Задача выполняется через триггер.
-             * Здесь можно указать, когда начинать запуск.
-             * Мы хотим сделать это сразу.
-             */
             Trigger trigger = newTrigger()
                     .startNow()
                     .withSchedule(times)
                     .build();
-            /**
-             * 5. Загрузка задачи и триггера в планировщик
-             *
-             */
             scheduler.scheduleJob(job, trigger);
-        } catch (SchedulerException e) {
+            Thread.sleep(10000);
+            scheduler.shutdown();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * читаем настройки для интервала
+     * @return интервал
+     */
     public static int propertiesInfo() {
         int rabbitInterval = 0;
         try (InputStream in = AlertRabbit.class.getClassLoader()
@@ -68,14 +93,15 @@ public class AlertRabbit {
         return rabbitInterval;
     }
 
-    /**
-     * Внутри этого класса нужно описать требуемые действия.
-     * В нашем случае - это вывод на консоль текста.
-     */
     public static class Rabbit implements Job {
+        public Rabbit() {
+            System.out.println(hashCode());
+        }
+
         @Override
-        public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        public void execute(JobExecutionContext context) throws JobExecutionException {
             System.out.println("Rabbit runs here ...");
+            Connection cn = (Connection) context.getJobDetail().getJobDataMap().get("connect");
         }
     }
 }
