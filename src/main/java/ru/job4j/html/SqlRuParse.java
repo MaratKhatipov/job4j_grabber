@@ -13,10 +13,6 @@ public class SqlRuParse {
         Elements row = doc.select(".postslisttopic");
         for (Element td : row) {
             Element parent = td.parent();
-//            System.out.println(parent.tag());
-//            System.out.println(parent.text());
-//            System.out.println("колличество детей " + parent.children().size());
-//            System.out.println("дата - " + parent.children().get(5).text());
             System.out.println(parent.child(5).text());
         }
 
