@@ -7,12 +7,14 @@ public class Post {
 
     private int id;
     private String title;
+    private String link;
     private String description;
     private LocalDateTime created;
 
-    public Post(int id, String title, String description, LocalDateTime created) {
+    public Post(int id, String title, String link, String description, LocalDateTime created) {
         this.id = id;
         this.title = title;
+        this.link = link;
         this.description = description;
         this.created = created;
     }
@@ -58,11 +60,14 @@ public class Post {
             return false;
         }
         Post post = (Post) o;
-        return id == post.id && title.equals(post.title) && created.equals(post.created);
+        return id == post.id
+                && title.equals(post.title)
+                && link.equals(post.link)
+                && created.equals(post.created);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, created);
+        return Objects.hash(id, title, link,  created);
     }
 }
