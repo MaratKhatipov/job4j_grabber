@@ -12,9 +12,23 @@ public class SqlRuParse {
         Document doc = Jsoup.connect("https://www.sql.ru/forum/job-offers").get();
         Elements row = doc.select(".postslisttopic");
         for (Element td : row) {
+            Element href = td.child(0);
             Element parent = td.parent();
-            System.out.println(parent.child(5).text());
+            System.out.println(href.text());
+            System.out.println(href.attr("href"));
+            System.out.println(parent.child(5).text() + System.lineSeparator());
         }
 
     }
 }
+
+
+/*
+       Document doc = Jsoup.connect("https://www.sql.ru/forum/job-offers").get();
+        Elements row = doc.select(".postslisttopic");
+        for (Element td : row) {
+            Element href = td.child(0);
+            System.out.println(href.attr("href"));
+            System.out.println(href.text());
+        }
+*/
