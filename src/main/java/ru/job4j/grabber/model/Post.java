@@ -11,8 +11,7 @@ public class Post {
     private String description;
     private LocalDateTime created;
 
-    public Post(int id, String title, String link, String description, LocalDateTime created) {
-        this.id = id;
+    public Post(String title, String link, String description, LocalDateTime created) {
         this.title = title;
         this.link = link;
         this.description = description;
@@ -60,23 +59,22 @@ public class Post {
             return false;
         }
         Post post = (Post) o;
-        return title.equals(post.title)
-                && link.equals(post.link)
-                && description.equals(post.description)
-                && created.equals(post.created);
+        return id == post.id && link.equals(post.link);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, link, description, created);
+        return Objects.hash(id, link);
     }
 
     @Override
     public String toString() {
-        return "Post{" + "id=" + id
+        return "Post{"
+                + "id=" + id
                 + ", title='" + title + '\''
                 + ", link='" + link + '\''
                 + ", description='" + description + '\''
-                + ", created=" + created + '}';
+                + ", created=" + created
+                + '}';
     }
 }
