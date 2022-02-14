@@ -5,12 +5,17 @@ import java.util.Map;
 import java.time.format.DateTimeFormatter;
 
 public class SqlRuDateTimeParser implements DateTimeParser {
+
+    private static final DateTimeFormatter FORMAT_PARSER1 =
+            DateTimeFormatter.ofPattern("dd M yy HH:mm");
+    private static final DateTimeFormatter FORMAT_PARSER2 =
+            DateTimeFormatter.ofPattern("dd M yy");
+    private static final String YESTERDAY = "вчера";
+    private static final String TODAY = "сегодня";
+
     private static final Map<String, String> MONTHS = Map.ofEntries(
-            Map.entry("вчера", LocalDateTime.now().minusDays(1)
-                    .format(
-                    DateTimeFormatter.ofPattern("dd M yy"))),
-            Map.entry("сегодня", LocalDateTime.now().format(
-                    DateTimeFormatter.ofPattern("dd M yy"))),
+            Map.entry(YESTERDAY, LocalDateTime.now().minusDays(1).format(FORMAT_PARSER2)),
+            Map.entry(TODAY, LocalDateTime.now().format(FORMAT_PARSER2)),
             Map.entry("янв", "1"),
             Map.entry("фев", "2"),
             Map.entry("мар", "3"),
@@ -24,9 +29,6 @@ public class SqlRuDateTimeParser implements DateTimeParser {
             Map.entry("ноя", "11"),
             Map.entry("дек", "12"));
 
-    private static final DateTimeFormatter FORMAT_PARSER1 =
-            DateTimeFormatter.ofPattern("dd M yy HH:mm");
-
     @Override
     public LocalDateTime parse(String parse) {
         String parseDT = "";
@@ -37,7 +39,6 @@ public class SqlRuDateTimeParser implements DateTimeParser {
                     dateSplit[0], MONTHS.get(dateSplit[1]), dateSplit[2], dateSplit[3]);
         }
         if (dateSplit.length == 2) {
-            String check = MONTHS.get(dateSplit[0]);
             parseDT = String.join(
                     " ",
                     MONTHS.get(dateSplit[0]), dateSplit[1]);
