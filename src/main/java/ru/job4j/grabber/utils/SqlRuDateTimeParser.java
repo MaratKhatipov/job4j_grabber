@@ -35,7 +35,7 @@ public class SqlRuDateTimeParser implements DateTimeParser {
      *
      * lengthIf2Parameters - два параметра в обозначении даты
      * (например: сегодня, 02:30 или вчера, 19:26)
-     *              
+     *
      * anotherDayLength - остальные обозначения даты
      *
      * @return преобразованую строку в дату
