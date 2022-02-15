@@ -7,9 +7,10 @@ import java.time.format.DateTimeFormatter;
 public class SqlRuDateTimeParser implements DateTimeParser {
 
     private static final DateTimeFormatter FORMAT_PARSER1 =
-            DateTimeFormatter.ofPattern("dd M yy HH:mm");
+            DateTimeFormatter.ofPattern("d M yy HH:mm");
     private static final DateTimeFormatter FORMAT_PARSER2 =
             DateTimeFormatter.ofPattern("dd M yy");
+
     private static final String YESTERDAY = "вчера";
     private static final String TODAY = "сегодня";
 
@@ -29,16 +30,29 @@ public class SqlRuDateTimeParser implements DateTimeParser {
             Map.entry("ноя", "11"),
             Map.entry("дек", "12"));
 
+    /**
+     * @param parse входная строка с датой с сайта
+     *
+     * lengthIf2Parameters - два параметра в обозначении даты
+     * (например: сегодня, 02:30 или вчера, 19:26)
+     *              
+     * anotherDayLength - остальные обозначения даты
+     *
+     * @return преобразованую строку в дату
+     */
     @Override
     public LocalDateTime parse(String parse) {
+        final int lengthIf2Parameters = 2;
+        final int anotherDayLength = 4;
+
         String parseDT = "";
         String[] dateSplit = parse.split("[, ]+");
-        if (dateSplit.length == 4) {
+        if (dateSplit.length == anotherDayLength) {
             parseDT = String.join(
                     " ",
                     dateSplit[0], MONTHS.get(dateSplit[1]), dateSplit[2], dateSplit[3]);
         }
-        if (dateSplit.length == 2) {
+        if (dateSplit.length == lengthIf2Parameters) {
             parseDT = String.join(
                     " ",
                     MONTHS.get(dateSplit[0]), dateSplit[1]);
