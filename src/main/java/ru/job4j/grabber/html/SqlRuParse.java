@@ -2,22 +2,26 @@ package ru.job4j.grabber.html;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import ru.job4j.grabber.Parse;
 import ru.job4j.grabber.model.Post;
 import ru.job4j.grabber.utils.DateTimeParser;
 import ru.job4j.grabber.utils.SqlRuDateTimeParser;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-public class SqlRuParse {
+public class SqlRuParse implements Parse {
 
     private final DateTimeParser dateTimeParser;
 
     public SqlRuParse(DateTimeParser dateTimeParser) {
         this.dateTimeParser = dateTimeParser;
     }
-/*
+
     @Override
     public List<Post> list(String link) throws IOException {
         List<Post> postList = new ArrayList<>();
@@ -33,8 +37,7 @@ public class SqlRuParse {
         return postList;
     }
 
- */
-
+    @Override
     public Post detail(String link) throws IOException {
         Document document = Jsoup.connect(link).get();
         Elements row = document.select("td.msgBody");
@@ -48,7 +51,7 @@ public class SqlRuParse {
         String description = row.get(1).text();
         return new Post(title, link, description, created);
     }
-/*
+
     public static void main(String[] args) throws IOException {
         String link = "https://www.sql.ru/forum/job-offers/";
 
@@ -60,11 +63,7 @@ public class SqlRuParse {
         System.out.println(postList.size());
 
         Post test = postList.get(3);
-        System.out.println(test.getDescription());
-        System.out.println(test.getTitle());
-        System.out.println(test.getLink());
+        System.out.println(test.toString());
 
     }
-
- */
 }
