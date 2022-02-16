@@ -21,7 +21,7 @@ public class SqlRuDateTimeParserTest {
         SqlRuDateTimeParser test = new SqlRuDateTimeParser();
         String test1 = "вчера, 05:08";
         LocalDateTime actual = test.parse(test1);
-        LocalDateTime expected = LocalDateTime.of(2022, 2, 14, 5, 8);
+        LocalDateTime expected = LocalDateTime.of(2022, 2, 15, 5, 8);
         assertThat(actual, is(expected));
     }
 
@@ -30,7 +30,7 @@ public class SqlRuDateTimeParserTest {
         SqlRuDateTimeParser test = new SqlRuDateTimeParser();
         String test1 = "сегодня, 05:08";
         LocalDateTime actual = test.parse(test1);
-        LocalDateTime expected = LocalDateTime.of(2022, 2, 15, 5, 8);
+        LocalDateTime expected = LocalDateTime.of(2022, 2, 16, 5, 8);
         assertThat(actual, is(expected));
     }
 }
