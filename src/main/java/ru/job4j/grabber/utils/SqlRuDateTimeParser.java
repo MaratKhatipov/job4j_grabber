@@ -7,6 +7,9 @@ import java.time.format.DateTimeFormatter;
 
 public class SqlRuDateTimeParser implements DateTimeParser {
 
+    public static final int LENGTH_IF_2_PARAMETERS = 2;
+    public static final int ANOTHER_DAY_LENGTH = 4;
+
     private static final DateTimeFormatter FORMAT_PARSER1 =
             DateTimeFormatter.ofPattern("d M yy HH:mm");
     private static final DateTimeFormatter FORMAT_PARSER2 =
@@ -43,17 +46,14 @@ public class SqlRuDateTimeParser implements DateTimeParser {
      */
     @Override
     public LocalDateTime parse(String parse) {
-        final int lengthIf2Parameters = 2;
-        final int anotherDayLength = 4;
-
         String parseDT = "";
         String[] dateSplit = parse.split("[, ]+");
-        if (dateSplit.length == anotherDayLength) {
+        if (dateSplit.length == ANOTHER_DAY_LENGTH) {
             parseDT = String.join(
                     " ",
                     dateSplit[0], MONTHS.get(dateSplit[1]), dateSplit[2], dateSplit[3]);
         }
-        if (dateSplit.length == lengthIf2Parameters) {
+        if (dateSplit.length == LENGTH_IF_2_PARAMETERS) {
             parseDT = String.join(
                     " ",
                     MONTHS.get(dateSplit[0]), dateSplit[1]);
