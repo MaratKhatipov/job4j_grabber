@@ -13,7 +13,7 @@ public interface Parse {
      * @return
      * @throws IOException
      */
-    List<Post> list(String link) throws IOException;
+    List<Post> list(String link);
 
     /**
      * Этот метод загружает детали объявления по ссылке типа -
@@ -24,5 +24,5 @@ public interface Parse {
      * @return
      * @throws IOException
      */
-    Post detail(String link) throws IOException;
+    Post detail(String link);
 }

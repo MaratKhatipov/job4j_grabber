@@ -23,29 +23,40 @@ public class SqlRuParse implements Parse {
     }
 
     @Override
-    public List<Post> list(String link) throws IOException {
+    public List<Post> list(String link) {
         List<Post> postList = new ArrayList<>();
-        for (int i = 1; i < 6; i++) {
-            Document doc = Jsoup.connect(link + i).get();
-            Elements row = doc.select(".postslisttopic");
-            for (Element td : row) {
-                Element href = td.child(0);
-                Element parent = td.parent();
-                postList.add(detail(href.attr("href")));
+            try {
+                for (int i = 1; i < 6; i++) {
+                    Document doc = Jsoup.connect(link + i).get();
+                    assert doc != null;
+                    Elements row = doc.select(".postslisttopic");
+                    for (Element td : row) {
+                        Element href = td.child(0);
+                        String title = td.child(0).text().toLowerCase();
+                        if (title.contains("java") && !title.contains("javascript")) {
+                            postList.add(detail(href.attr("href")));
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                    e.printStackTrace();
             }
-        }
-        return postList;
+            return postList;
     }
 
     @Override
-    public Post detail(String link) throws IOException {
-        Document document = Jsoup.connect(link).get();
+    public Post detail(String link) {
+        Document document = null;
+        try {
+            document = Jsoup.connect(link).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Elements row = document.select("td.msgBody");
         Elements titleData = document.select(".messageHeader");
 
         String[] arr = document.select(".msgFooter").get(0).text().split("\\[+");
-        SqlRuDateTimeParser parser = new SqlRuDateTimeParser();
-        LocalDateTime created = parser.parse(arr[0]);
+        LocalDateTime created = dateTimeParser.parse(arr[0]);
 
         String title = titleData.parents().get(0).text();
         String description = row.get(1).text();
@@ -61,9 +72,8 @@ public class SqlRuParse implements Parse {
         List<Post> postList = sqlRuParse.list(link);
 
         System.out.println(postList.size());
-
-        Post test = postList.get(3);
-        System.out.println(test.toString());
-
+        for (Post s : postList) {
+            System.out.println(s);
+        }
     }
 }
