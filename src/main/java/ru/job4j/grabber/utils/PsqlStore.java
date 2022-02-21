@@ -1,8 +1,13 @@
 package ru.job4j.grabber.utils;
 
 import ru.job4j.grabber.Store;
+import ru.job4j.grabber.html.SqlRuParse;
 import ru.job4j.grabber.model.Post;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,13 +71,13 @@ public class PsqlStore implements Store, AutoCloseable {
     public Post findById(int id) {
         Post post = null;
         try (PreparedStatement statement = cnn.prepareStatement("select * from post where id=?")) {
-
             statement.setInt(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                post = getPost(resultSet);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    post = getPost(resultSet);
+                }
             }
-            } catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return post;
@@ -94,5 +99,22 @@ public class PsqlStore implements Store, AutoCloseable {
         if (cnn != null) {
             cnn.close();
         }
+    }
+
+    public static void main(String[] args) throws IOException {
+        Properties cfg = new Properties();
+        cfg.load(new FileReader(String.valueOf(Path.of("./src/main/resources/app.properties"))));
+        PsqlStore example = new PsqlStore(cfg);
+        String link = "https://www.sql.ru/forum/job-offers/";
+        SqlRuParse parse = new SqlRuParse(new SqlRuDateTimeParser());
+        List<Post> postList = parse.list(link);
+        for (Post post : postList) {
+            example.save(post);
+        }
+       for (Post post : example.getAll()) {
+            System.out.println(post);
+        }
+        Post postFindById = example.findById(3);
+        System.out.println(postFindById);
     }
 }

@@ -84,12 +84,12 @@ public class Post {
 
     @Override
     public String toString() {
-        return "Post{"
-                + "id=" + id
-                + ", title='" + title + '\''
-                + ", link='" + link + '\''
-                + ", description='" + description + '\''
-                + ", created=" + created
+        return "Post{" + "\n"
+                + "id=" + id + "\n"
+                + "Заголовок - '" + title + '\'' + "\n"
+                + "Ссылка - '" + link + '\'' + "\n"
+                + "Описание - '" + description + '\'' + "\n"
+                + "Дата создания - " + created
                 + '}';
     }
 }
