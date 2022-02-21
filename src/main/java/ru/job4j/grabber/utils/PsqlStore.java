@@ -101,20 +101,27 @@ public class PsqlStore implements Store, AutoCloseable {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         Properties cfg = new Properties();
-        cfg.load(new FileReader(String.valueOf(Path.of("./src/main/resources/app.properties"))));
-        PsqlStore example = new PsqlStore(cfg);
         String link = "https://www.sql.ru/forum/job-offers/";
-        SqlRuParse parse = new SqlRuParse(new SqlRuDateTimeParser());
-        List<Post> postList = parse.list(link);
-        for (Post post : postList) {
-            example.save(post);
+        try (FileReader fr = new FileReader(
+                String.valueOf(Path.of(
+                        "./src/main/resources/app.properties")))) {
+            cfg.load(fr);
+            try (PsqlStore example = new PsqlStore(cfg)) {
+                SqlRuParse parse = new SqlRuParse(new SqlRuDateTimeParser());
+                List<Post> postList = parse.list(link);
+                for (Post post : postList) {
+                    example.save(post);
+                }
+                for (Post post : example.getAll()) {
+                    System.out.println(post);
+                }
+                Post postFindById = example.findById(3);
+                System.out.println(postFindById);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-       for (Post post : example.getAll()) {
-            System.out.println(post);
-        }
-        Post postFindById = example.findById(3);
-        System.out.println(postFindById);
     }
 }
