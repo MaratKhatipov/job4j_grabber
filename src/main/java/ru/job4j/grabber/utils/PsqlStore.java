@@ -4,9 +4,7 @@ import ru.job4j.grabber.Store;
 import ru.job4j.grabber.html.SqlRuParse;
 import ru.job4j.grabber.model.Post;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.*;
 import java.util.ArrayList;
