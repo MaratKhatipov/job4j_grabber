@@ -28,10 +28,10 @@ public class User {
         this.name = name;
     }
 
-//    @Override
-//    protected void finalize() throws Throwable {
-//        System.out.printf("объект удалён %d %s%n", age, name);
-//    }
+    @Override
+    protected void finalize() throws Throwable {
+        System.out.printf("объект удалён %d %s%n", age, name);
+    }
 
     @Override
     public String toString() {

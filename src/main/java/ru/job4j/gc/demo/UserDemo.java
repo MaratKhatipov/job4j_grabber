@@ -1,7 +1,5 @@
 package ru.job4j.gc.demo;
 
-import ru.job4j.gc.Person;
-
 public class UserDemo {
 
     private static final long KB = 1024;
@@ -27,7 +25,7 @@ public class UserDemo {
         User user = new User(50, "Petya");
         System.out.println(user);
         for (int i = 0; i < 9000; i++) {
-//            System.out.println("\r" + i);
+            System.out.println("\r" + i);
             new User(i, "Petya");
         }
         System.gc();
