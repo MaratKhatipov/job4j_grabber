@@ -11,8 +11,11 @@ public class Post {
     private LocalDateTime created;
 
     public Post(int id, String title, String link, String description, LocalDateTime created) {
-        this(title, link, description, created);
         this.id = id;
+        this.title = title;
+        this.link = link;
+        this.description = description;
+        this.created = created;
     }
 
     public Post(String title, String link, String description, LocalDateTime created) {
@@ -22,19 +25,12 @@ public class Post {
         this.created = created;
     }
 
-    public Post() {
-    }
-
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public void setLink(String link) {
-        this.link = link;
     }
 
     public String getTitle() {
@@ -47,6 +43,10 @@ public class Post {
 
     public String getLink() {
         return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 
     public String getDescription() {
@@ -66,30 +66,29 @@ public class Post {
     }
 
     @Override
+    public String toString() {
+        return "Post{id=" + id
+                + ", title='" + title
+                + "', link='" + link
+                + "', description='" + description
+                + "', created=" + created
+                + '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof Post)) {
             return false;
         }
         Post post = (Post) o;
-        return id == post.id && link.equals(post.link);
+        return getId() == post.getId() && Objects.equals(getLink(), post.getLink());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, link);
-    }
-
-    @Override
-    public String toString() {
-        return "Post{" + "\n"
-                + "id=" + id + "\n"
-                + "Заголовок - '" + title + '\'' + "\n"
-                + "Ссылка - '" + link + '\'' + "\n"
-                + "Описание - '" + description + '\'' + "\n"
-                + "Дата создания - " + created
-                + '}';
+        return Objects.hash(getId(), getLink());
     }
 }

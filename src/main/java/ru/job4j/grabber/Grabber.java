@@ -1,12 +1,10 @@
-package ru.job4j.grabber.utils;
+package ru.job4j.grabber;
 
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
-import ru.job4j.grabber.Grab;
-import ru.job4j.grabber.Parse;
-import ru.job4j.grabber.Store;
-import ru.job4j.grabber.html.SqlRuParse;
+import ru.job4j.grabber.html.HabrCareerParse;
 import ru.job4j.grabber.model.Post;
+import ru.job4j.grabber.utils.HabrCareerDateTimeParser;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -20,6 +18,8 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 public class Grabber implements Grab {
+    private static String sourceLink;
+
     private final Properties cfg = new Properties();
 
     public Store store() {
@@ -32,9 +32,14 @@ public class Grabber implements Grab {
         return scheduler;
     }
 
-    public void cfg() throws IOException {
-        try (InputStream in = new FileInputStream("./src/main/resources/app.properties")) {
+    public void cfg() {
+        try (InputStream in = Grabber.class
+                .getClassLoader()
+                .getResourceAsStream("app.properties")) {
             cfg.load(in);
+            sourceLink = cfg.getProperty("grabber.link");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -56,10 +61,24 @@ public class Grabber implements Grab {
         scheduler.scheduleJob(job, trigger);
     }
 
+    public static class GrabJob implements Job {
+
+        @Override
+        public void execute(JobExecutionContext context) throws JobExecutionException {
+            JobDataMap map = context.getJobDetail().getJobDataMap();
+            Store store = (Store) map.get("store");
+            Parse parse = (Parse) map.get("parse");
+            System.out.println("start parse");
+            List<Post> list = parse.list(sourceLink);
+            list.forEach(store::save);
+            System.out.println("finish");
+        }
+    }
+
     public void web(Store store) {
         new Thread(() -> {
-            try (ServerSocket server = new ServerSocket(Integer.parseInt(
-                    cfg.getProperty("port")))) {
+            try (ServerSocket server =
+                         new ServerSocket(Integer.parseInt(cfg.getProperty("port")))) {
                 while (!server.isClosed()) {
                     Socket socket = server.accept();
                     try (OutputStream out = socket.getOutputStream()) {
@@ -78,28 +97,14 @@ public class Grabber implements Grab {
         }).start();
     }
 
-    public static class GrabJob implements Job {
-
-        @Override
-        public void execute(JobExecutionContext context) {
-            String link = "https://www.sql.ru/forum/job-offers/";
-            JobDataMap map = context.getJobDetail().getJobDataMap();
-            Store store = (Store) map.get("store");
-            Parse parse = (Parse) map.get("parse");
-            List<Post> postList = parse.list(link);
-            for (Post post : postList) {
-                store.save(post);
-            }
-        }
-
-    }
-
-    public static void main(String[] args) throws IOException, SchedulerException {
+    public static void main(String[] args) throws Exception {
         Grabber grab = new Grabber();
         grab.cfg();
         Scheduler scheduler = grab.scheduler();
         Store store = grab.store();
-        grab.init(new SqlRuParse(new SqlRuDateTimeParser()), store, scheduler);
+        grab.init(new HabrCareerParse(new HabrCareerDateTimeParser()),
+                store,
+                scheduler);
         grab.web(store);
     }
 }
